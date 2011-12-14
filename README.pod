@@ -1,1 +1,3 @@
-=head1 gdy client
+=head1 Introduction
+
+a cli gdy client.
