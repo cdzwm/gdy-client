@@ -1,3 +1,37 @@
+=encoding utf8
+
 =head1 Introduction
 
 A cli gdy client.
+
+=head2 Running the client
+
+$ node index.js
+
+=head1 Dependcies
+
+=over
+
+=item * node.js(>=0.6.0)
+
+=back
+
+=head1 Development Tools
+
+=over
+
+=item * Emacs
+
+=item * Git
+
+=item * EditPlus
+
+=back
+
+=head1 Licence
+
+MIT license
+
+=head1 Authors
+
+canw(nodejs@live.cn), eggcaker(eggcaker@gmail.com)
