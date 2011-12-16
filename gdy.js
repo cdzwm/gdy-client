@@ -1,4 +1,6 @@
+global.DEBUG = (process.env.GDY_DEBUG || false) == 1;
 var net = require('net');
+var msg = require("./lib/msg");
 
 var msg_begin = "GDY_MSG_BEGIN{";
 var msg_end="}GDY_MSG_END";
@@ -29,15 +31,22 @@ function hello(){
 	client.write(msg_begin + JSON.stringify(hello_msg) + msg_end);
 }
 function onReceiveMessage(data){
-	hello_msg.cmd =  "LOGIN";
-	console.log(data);
-	client.write(msg_begin + JSON.stringify(hello_msg) + msg_end);
+	var mq = [];
+	msg.parseMessage(data, mq);
+	if( mq[0].cmd == "HELLO_OK" ){
+		hello_msg.cmd =  "LOGIN";
+		client.write(msg_begin + JSON.stringify(hello_msg) + msg_end);
+		if( DEBUG )
+			console.log("LOGIN");
+	}
+	else {
+		consoe.log(mq[0].cmd);
+	}
 }
 
 function sendMessage(){
 	hello_msg.cmd =  "MSG";
 	var s = msg_begin + JSON.stringify(hello_msg) + msg_end;
-	console.log(s);
 	client.write(s);
 	t = setTimeout(sendMessage, Math.round(Math.random() * 5000));
 }
