@@ -52,5 +52,5 @@ function sendMessage(){
 	var s = msg_begin + JSON.stringify(hello_msg) + msg_end;
 	for(var i=0;i<1;i++)
 	client.write(s);
-	t = setTimeout(sendMessage, Math.round(Math.random() * 2000));
+	t = setTimeout(sendMessage, Math.round(Math.random() * 1000));
 }
