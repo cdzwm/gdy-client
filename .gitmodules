@@ -1,0 +1,3 @@
+[submodule "deps/comm"]
+	path = deps/comm
+	url = https://cdzwm@github.com/cdzwm/gdy-comm.git
