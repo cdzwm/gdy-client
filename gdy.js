@@ -17,7 +17,7 @@ var t
 	client.setEncoding('utf8');
 	client.on("close", function(){
 		clearTimeout(t);
-		console.log("exit");
+		console.log("Server is timeout.");
 	});
 	client.on('data', onReceiveMessage);
 });
