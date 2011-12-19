@@ -27,26 +27,30 @@ client.on("error", function(err){
 		console.log("无法连接服务器");
 });
 function hello(){
-	hello_msg.cmd =  "HELLO";
+	hello_msg.cmd =  "CONNECT";
 	client.write(msg_begin + JSON.stringify(hello_msg) + msg_end);
 }
 function onReceiveMessage(data){
 	var mq = [];
 	message.parseMessage(data, mq);
-	if( mq[0].cmd == "HELLO_OK" ){
-		hello_msg.cmd =  "LOGIN";
-		client.write(msg_begin + JSON.stringify(hello_msg) + msg_end);
+	if( mq[0].cmd == "CONNECT_OK" ){
+		login_msg = {cmd: "LOGIN", username:"gdy", password:"gdypassword"};
+		client.write(msg_begin + JSON.stringify(login_msg) + msg_end);
 		if( DEBUG )
 			console.log("LOGIN");
 	}
 	else {
-		consoe.log(mq[0].cmd);
+		console.log(mq[0].cmd);
+		if( mq[0].cmd == "HELLO" ){
+			client.write(message.newMessage("HELLO_OK"));
+		}
 	}
 }
 
 function sendMessage(){
 	hello_msg.cmd =  "MSG";
 	var s = msg_begin + JSON.stringify(hello_msg) + msg_end;
+	for(var i=0;i<1;i++)
 	client.write(s);
-	t = setTimeout(sendMessage, Math.round(Math.random() * 5000));
+	t = setTimeout(sendMessage, Math.round(Math.random() * 2000));
 }
