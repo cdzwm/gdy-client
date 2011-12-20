@@ -1,6 +1,6 @@
 global.DEBUG = (process.env.GDY_DEBUG || false) == 1;
 var net = require('net');
-var message = require("./deps/comm/message");
+var message = require("./lib/comm/message");
 
 var t;
 var client = net.connect(10086, '127.0.0.1', function(){
