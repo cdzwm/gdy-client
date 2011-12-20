@@ -20,7 +20,7 @@ client.on("error", function(err){
 });
 
 function hello(){
-	client.write(message.newMessage("CONNECT"));
+	client.write(message.packMessage(message.newMessage("CONNECT")));
 }
 function onReceiveMessage(data){
 	var mq = [];
@@ -35,13 +35,14 @@ function onReceiveMessage(data){
 	else {
 		console.log(mq[0].cmd);
 		if( mq[0].cmd == "HELLO" ){
-			client.write(message.newMessage("HELLO_OK"));
+			client.write(message.packMessage(message.newMessage("HELLO_OK")));
 		}
 	}
 }
 
 function sendMessage(){
 	for(var i=0;i<1;i++)
-		client.write(message.newMessage("MSG"));
+		client.write(message.packMessage(message.newMessage("MSG")));
+
 	t = setTimeout(sendMessage, Math.round(Math.random() * 1000));
 }
