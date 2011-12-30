@@ -5,7 +5,7 @@ var message = require("./lib/comm/message");
 var t;
 var client = net.connect(10086, '127.0.0.1', function(){
 	setTimeout(hello, 500);
-	t = setTimeout(sendMessage, 1000);
+	t = setTimeout(sendMessage, 100000);
 	client.setEncoding('utf8');
 	client.on("close", function(){
 		clearTimeout(t);
@@ -27,7 +27,7 @@ function onReceiveMessage(data){
 	message.parseMessage(data, mq);
 	if( mq[0].cmd == "CONNECT_OK" ){
 
-		login_msg = {cmd: "LOGIN", username:"gdy", password:"gdypassword"};
+		login_msg = {cmd: "LOGIN", username:"player1", password:"password"};
 		client.write(message.msgBegin() + JSON.stringify(login_msg) + message.msgEnd());
 		if( DEBUG )
 			console.log("LOGIN");
