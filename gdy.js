@@ -3,7 +3,7 @@ var net = require('net');
 var message = require("./lib/comm/message");
 
 var t;
-var client = net.connect(10086, '127.0.0.1', function(){
+var client = net.connect(10086, '133.109.55.198', function(){
 	setTimeout(hello, 500);
 	t = setTimeout(sendMessage, 30000);
 	client.setEncoding('utf8');
@@ -41,8 +41,8 @@ function onReceiveMessage(data){
 }
 
 function sendMessage(){
-	for(var i=0;i<1;i++)
+	for(var i=0;i<10;i++)
 		client.write(message.packMessage(message.newMessage("MSG")));
-
-	t = setTimeout(sendMessage, Math.round(Math.random() * 1000));
+	DBG_LOG("i", "MSG");
+	t = setTimeout(sendMessage, Math.round(Math.random() * 2000));
 }
