@@ -5,7 +5,7 @@ var message = require("./lib/comm/message");
 var t;
 var client = net.connect(10086, '127.0.0.1', function(){
 	setTimeout(hello, 500);
-	t = setTimeout(sendMessage, 100000);
+	t = setTimeout(sendMessage, 30000);
 	client.setEncoding('utf8');
 	client.on("close", function(){
 		clearTimeout(t);
