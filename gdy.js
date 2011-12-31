@@ -1,4 +1,4 @@
-global.DEBUG = (process.env.GDY_DEBUG || false) == 1;
+require("./lib/comm/debug");
 var net = require('net');
 var message = require("./lib/comm/message");
 
@@ -9,14 +9,14 @@ var client = net.connect(10086, '127.0.0.1', function(){
 	client.setEncoding('utf8');
 	client.on("close", function(){
 		clearTimeout(t);
-		console.log("Server is timeout.");
+		DBG_LOG("i", "Server is timeout.");
 	});
 	client.on('data', onReceiveMessage);
 });
 
 client.on("error", function(err){
 	if( err.code == "ECONNREFUSED")
-		console.log("无法连接服务器");
+		DBG_LOG("e", "无法连接服务器");
 });
 
 function hello(){
@@ -30,10 +30,10 @@ function onReceiveMessage(data){
 		login_msg = {cmd: "LOGIN", username:"player1", password:"password"};
 		client.write(message.msgBegin() + JSON.stringify(login_msg) + message.msgEnd());
 		if( DEBUG )
-			console.log("LOGIN");
+			DBG_LOG("i", "LOGIN");
 	}
 	else {
-		console.log(mq[0].cmd);
+		DBG_LOG("i", mq[0].cmd);
 		if( mq[0].cmd == "HELLO" ){
 			client.write(message.packMessage(message.newMessage("HELLO_OK")));
 		}
