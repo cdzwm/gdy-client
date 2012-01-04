@@ -3,9 +3,9 @@ var net = require('net');
 var message = require("./lib/comm/message");
 
 var t;
-var client = net.connect(10086, '133.109.55.198', function(){
-	setTimeout(hello, 500);
-	t = setTimeout(sendMessage, 30000);
+var client = net.connect(10086, '127.0.0.1', function(){
+	setTimeout(connect, 500);
+	t = setTimeout(sendMessage, 5000);
 	client.setEncoding('utf8');
 	client.on("close", function(){
 		clearTimeout(t);
@@ -19,7 +19,7 @@ client.on("error", function(err){
 		DBG_LOG("e", "无法连接服务器");
 });
 
-function hello(){
+function connect(){
 	client.write(message.packMessage(message.newMessage("CONNECT")));
 }
 function onReceiveMessage(data){
@@ -33,7 +33,6 @@ function onReceiveMessage(data){
 			DBG_LOG("i", "LOGIN");
 	}
 	else {
-		DBG_LOG("i", mq[0].cmd);
 		if( mq[0].cmd == "HELLO" ){
 			client.write(message.packMessage(message.newMessage("HELLO_OK")));
 		}
@@ -41,8 +40,7 @@ function onReceiveMessage(data){
 }
 
 function sendMessage(){
-	for(var i=0;i<10;i++)
+	for(var i=0;i<1;i++)
 		client.write(message.packMessage(message.newMessage("MSG")));
-	DBG_LOG("i", "MSG");
-	t = setTimeout(sendMessage, Math.round(Math.random() * 2000));
+	t = setTimeout(sendMessage, 1000 + Math.round(Math.random() * 2000));
 }
