@@ -20,7 +20,7 @@ client.on("error", function(err){
 });
 
 function connect(){
-	client.write(message.packMessage(message.newMessage("CONNECT")));
+	client.write(message.pack(message.new("CONNECT")));
 }
 function onReceiveMessage(data){
 	var mq = [];
@@ -34,13 +34,13 @@ function onReceiveMessage(data){
 	}
 	else {
 		if( mq[0].cmd == "HELLO" ){
-			client.write(message.packMessage(message.newMessage("HELLO_OK")));
+			client.write(message.pack(message.new("HELLO_OK")));
 		}
 	}
 }
 
 function sendMessage(){
 	for(var i=0;i<1;i++)
-		client.write(message.packMessage(message.newMessage("MSG")));
+		client.write(message.pack(message.new("MSG")));
 	t = setTimeout(sendMessage, 1000 + Math.round(Math.random() * 2000));
 }
