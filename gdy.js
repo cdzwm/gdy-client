@@ -1,6 +1,7 @@
 require("./lib/comm/debug");
-var net = require('net');
-var message = require("./lib/comm/message");
+require("./lib/comm/util");
+var message = require("./lib/comm/message")
+,net = require('net');
 
 var t;
 var client = net.connect(10086, '127.0.0.1', function(){
