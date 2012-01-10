@@ -23,7 +23,6 @@ client.on("error", function(err){
 });
 
 function connect(){
-	DBG_LOG("i", "connected");
 	client.setEncoding("utf8");
 	client.on("data", receiveMessage);
 	client.on("close", cleanupSession);
@@ -47,7 +46,6 @@ function sendMessage(msg){
 
 //
 function receiveMessage(data){
-	DBG_LOG("i", "receive message");
 	client.data += data;
 	client.data = client.data.slice(message.parseMessage(client.data, client.mq));
 	processMessage();
@@ -65,7 +63,6 @@ function handleSocketError(){
 
 // dispatch message
 function processMessage(){
-	DBG_LOG("i", "process message");
 	if( client.mq.length > 0){
 		while( client.mq.length>0){
 			var msg = client.mq.shift();

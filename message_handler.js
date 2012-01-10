@@ -11,7 +11,6 @@ callbacks["f_default"] = function(client, msg){
 }
 
 callbacks["f_connect_ok"] = function(client, msg){
-	DBG_LOG("i", "Begin connect");
 	var mymsg = message.new("LOGIN");
 	mymsg.username="player1";
 	mymsg.password="password";
