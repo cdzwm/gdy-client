@@ -13,6 +13,7 @@ var host="127.0.0.1", port=10086;
 var client = net.connect(port, host, connect);
 client.data = "";
 client.mq=[];
+client.prompt = "Cmd>";
 
 client.sendMessage = sendMessage;
 
@@ -33,7 +34,7 @@ function connect(){
 				// TODO: 发送信息错误处理。
 			}
 		}
-		process.stdout.write("Cmd>");
+		process.stdout.write(client.prompt);
 	});
 	process.stdin.setEncoding("utf8");
 	process.stdin.resume();

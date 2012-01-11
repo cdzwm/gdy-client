@@ -9,7 +9,7 @@ var callbacks={}; // message handle callback functions
 callbacks["f_default"] = function(client, msg){
 	DBG_LOG("i", msg.cmd);
 	console.log(msg.cmd);
-	process.stdout.write("Cmd>");
+	process.stdout.write(client.prompt);
 }
 
 callbacks["f_connect_ok"] = function(client, msg){
@@ -21,7 +21,7 @@ callbacks["f_connect_ok"] = function(client, msg){
 
 callbacks["f_login_ok"] = function(client, msg){
 	DBG_LOG("i", msg.cmd);
-	process.stdout.write("Cmd>");
+	process.stdout.write(client.prompt);
 }
 
 callbacks["f_hello"] = function(client, msg){
@@ -30,7 +30,11 @@ callbacks["f_hello"] = function(client, msg){
 }
 
 callbacks["f_get_name_resp"] = function(client, msg){
-	console.log("Your name is: " + msg.name);
+	console.log("id: " + msg.playerid);
+	console.log("name: " + msg.name);
+	console.log("nickname: " + msg.nickname);
+	console.log("description: " + msg.description);
+	process.stdout.write(client.prompt);
 }
 
 module.exports.handlers = callbacks;
