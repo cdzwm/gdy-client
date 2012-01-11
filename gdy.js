@@ -14,9 +14,7 @@ var client = net.connect(port, host, connect);
 client.data = "";
 client.mq=[];
 
-client.sendMessage = function(msg){
-	client.write(message.pack(msg));
-}
+client.sendMessage = sendMessage;
 
 client.on("error", function(err){
 	DBG_LOG("e", "Cannot connect to server.");
@@ -29,6 +27,17 @@ function connect(){
 	client.on("error", handleSocketError);
 	// begin to connect
 	sendMessage(message.new("CONNECT"));
+	process.stdin.on("data", function(trunck){
+		if( trunck.length > 2){
+			if(client.sendMessage(message.new(trunck.substr(0, trunck.length-2)))){
+				// TODO: 发送信息错误处理。
+			}
+		}
+		process.stdout.write("Cmd>");
+	});
+	process.stdin.setEncoding("utf8");
+	process.stdin.resume();
+	process.stdout.setEncoding("utf8");
 }
 
 // send message function
