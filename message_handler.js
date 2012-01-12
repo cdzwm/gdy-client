@@ -6,35 +6,38 @@ var callbacks={}; // message handle callback functions
 // Set message handle callback functions
 
 // default message handle function
-callbacks["f_default"] = function(client, msg){
+callbacks["f_default"] = function(msg){
 	DBG_LOG("i", msg.cmd);
-	console.log(msg.cmd);
-	process.stdout.write(client.prompt);
+	if( session.state != "LOGINED" ){
+		session.end();
+	}
+	process.stdout.write(session.prompt);
 }
 
-callbacks["f_connect_ok"] = function(client, msg){
+callbacks["f_connect_ok"] = function(msg){
 	var mymsg = message.new("LOGIN");
 	mymsg.username="player1";
 	mymsg.password="password";
-	client.sendMessage( mymsg);
+	session.sendMessage( mymsg);
 }
 
-callbacks["f_login_ok"] = function(client, msg){
+callbacks["f_login_ok"] = function(msg){
 	DBG_LOG("i", msg.cmd);
-	process.stdout.write(client.prompt);
+	session.state = "LOGINED";
+	process.stdout.write(session.prompt);
 }
 
-callbacks["f_hello"] = function(client, msg){
+callbacks["f_hello"] = function(msg){
 	var mymsg = message.new("HELLO_RESP");
-	client.sendMessage(mymsg);
+	session.sendMessage(mymsg);
 }
 
-callbacks["f_get_name_resp"] = function(client, msg){
-	console.log("id: " + msg.playerid);
+callbacks["f_get_name_resp"] = function(msg){
+	console.log("id: " + msg.id);
 	console.log("name: " + msg.name);
 	console.log("nickname: " + msg.nickname);
 	console.log("description: " + msg.description);
-	process.stdout.write(client.prompt);
+	process.stdout.write(session.prompt);
 }
 
 module.exports.handlers = callbacks;
