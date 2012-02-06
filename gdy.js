@@ -1,48 +1,94 @@
-global.DEBUG = (process.env.GDY_DEBUG || false) == 1;
-var net = require('net');
-var message = require("./lib/comm/message");
+require("./lib/comm/debug");
+require("./lib/comm/util");
 
-var t;
-var client = net.connect(10086, '121.26.192.10', function(){
-	setTimeout(hello, 500);
-	t = setTimeout(sendMessage, 1000);
-	client.setEncoding('utf8');
-	client.on("close", function(){
-		clearTimeout(t);
-		console.log("Server is timeout.");
-	});
-	client.on('data', onReceiveMessage);
-});
+var EventEmitter = require("events").EventEmitter;
+module.exports = new EventEmitter();
+
+global.session = {};
+var net = require('net');
+var message = require("./lib/comm/message")
+	,handlers = require("./message_handler").handlers;
+
+var host="127.0.0.1", port=10086;
+
+var client = net.connect(port, host, connect);
+session.end = function(){
+	client.end();
+}
+
+session.data = "";
+session.mq=[];
+session.prompt = "Cmd>";
+session.state = "";
+session.sendMessage = sendMessage;
 
 client.on("error", function(err){
-	if( err.code == "ECONNREFUSED")
-		console.log("无法连接服务器");
+	DBG_LOG("e", "Cannot connect to server.");
 });
 
-function hello(){
-	client.write(message.packMessage(message.newMessage("CONNECT")));
+function connect(){
+	client.setEncoding("utf8");
+	client.on("data", receiveMessage);
+	client.on("close", cleanupSession);
+	client.on("error", handleSocketError);
+	// begin to connect
+	session.sendMessage(message.new("CONNECT"));
+	session.state = "CONNECT";
+	process.stdin.on("data", function(trunck){
+		if( trunck.length > 2){
+			if(session.sendMessage(message.new(trunck.substr(0, trunck.length-2)))){
+				// TODO: 发送信息错误处理。
+			}
+		}
+		process.stdout.write(session.prompt);
+	});
+	process.stdin.setEncoding("utf8");
+	process.stdin.resume();
+	process.stdout.setEncoding("utf8");
 }
-function onReceiveMessage(data){
-	var mq = [];
-	message.parseMessage(data, mq);
-	if( mq[0].cmd == "CONNECT_OK" ){
 
-		login_msg = {cmd: "LOGIN", username:"gdy", password:"gdypassword"};
-		client.write(message.msgBegin() + JSON.stringify(login_msg) + message.msgEnd());
-		if( DEBUG )
-			console.log("LOGIN");
+// send message function
+function sendMessage(msg){
+	try{
+		var ret = client.write(message.pack(msg), function(){
+			DBG_LOG("i", "write ok");
+		});
 	}
-	else {
-		console.log(mq[0].cmd);
-		if( mq[0].cmd == "HELLO" ){
-			client.write(message.packMessage(message.newMessage("HELLO_OK")));
+	catch(e){
+		return false;
+	}
+	return true;
+}
+
+//
+function receiveMessage(data){
+	session.data += data;
+	session.data = session.data.slice(message.parseMessage(session.data, session.mq));
+	processMessage();
+}
+
+//
+function cleanupSession(){
+	DBG_LOG("i", "disconnected.");
+}
+
+//
+function handleSocketError(){
+	DBG_LOG("i", "socket error");
+}
+
+// dispatch message
+function processMessage(){
+	if( session.mq.length > 0){
+		while( session.mq.length>0){
+			var msg = session.mq.shift();
+			var fname = "f_" + msg.cmd.toLowerCase();
+			if( handlers.hasOwnProperty(fname)  && typeof(handlers[fname]) == "function" ){
+				handlers[fname](msg);
+			}
+			else{
+				handlers["f_default"](msg);
+			}
 		}
 	}
-}
-
-function sendMessage(){
-	for(var i=0;i<1;i++)
-		client.write(message.packMessage(message.newMessage("MSG")));
-
-	t = setTimeout(sendMessage, Math.round(Math.random() * 1000));
 }
