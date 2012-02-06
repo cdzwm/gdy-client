@@ -3,7 +3,7 @@ var net = require('net');
 var message = require("./lib/comm/message");
 
 var t;
-var client = net.connect(10086, '127.0.0.1', function(){
+var client = net.connect(10086, '121.26.192.10', function(){
 	setTimeout(hello, 500);
 	t = setTimeout(sendMessage, 1000);
 	client.setEncoding('utf8');
