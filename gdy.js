@@ -40,7 +40,9 @@ function connect(){
 				// TODO: 发送信息错误处理。
 			}
 		}
-		process.stdout.write(session.prompt);
+		else{
+			process.stdout.write(session.prompt);
+		}
 	});
 	process.stdin.setEncoding("utf8");
 	process.stdin.resume();
@@ -51,7 +53,6 @@ function connect(){
 function sendMessage(msg){
 	try{
 		var ret = client.write(message.pack(msg), function(){
-			DBG_LOG("i", "write ok");
 		});
 	}
 	catch(e){

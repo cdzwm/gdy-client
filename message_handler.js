@@ -40,4 +40,9 @@ callbacks["f_get_name_resp"] = function(msg){
 	process.stdout.write(session.prompt);
 }
 
+callbacks["f_who_resp"] = function(msg){
+	console.log(msg.name);
+	process.stdout.write(session.prompt);
+}
+
 module.exports.handlers = callbacks;
