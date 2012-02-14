@@ -3,6 +3,7 @@ require("./lib/comm/util");
 
 var EventEmitter = require("events").EventEmitter;
 module.exports = new EventEmitter();
+var readline = require("readline"), cli;
 
 global.session = {};
 var net = require('net');
@@ -10,42 +11,54 @@ var message = require("./lib/comm/message")
 	,handlers = require("./message_handler").handlers;
 
 var host="127.0.0.1", port=10086;
-
 var client = net.connect(port, host, connect);
-session.end = function(){
-	client.end();
-}
-
-session.data = "";
-session.mq=[];
-session.prompt = "Cmd>";
-session.state = "";
-session.sendMessage = sendMessage;
 
 client.on("error", function(err){
 	DBG_LOG("e", "Cannot connect to server.");
 });
+
+session.end = function(){
+	client.end();
+}
+session.data = "";
+session.mq=[];
+session.pro = "Cmd>";
+session.state = "";
+session.sendMessage = sendMessage;
+session.prompt = function(){
+	cli.prompt();
+}
+
+session.shutDown = function(){
+	client.end();
+	process.exit(0);
+}
+
+function processCmd(trunck){
+	if( trunck.length > 0){
+		if(session.sendMessage(message.new(trunck))){
+			// TODO: 发送信息错误处理。
+		}
+	}
+	else{
+		cli.prompt();
+	}
+}
+
+cli = readline.createInterface(process.stdin, process.stdout);
+cli.setPrompt(session.pro, session.pro.length);
+cli.on('line', processCmd);
 
 function connect(){
 	client.setEncoding("utf8");
 	client.on("data", receiveMessage);
 	client.on("close", cleanupSession);
 	client.on("error", handleSocketError);
+
 	// begin to connect
 	session.sendMessage(message.new("CONNECT"));
 	session.state = "CONNECT";
-	process.stdin.on("data", function(trunck){
-		if( trunck.length > 2){
-			if(session.sendMessage(message.new(trunck.substr(0, trunck.length-2)))){
-				// TODO: 发送信息错误处理。
-			}
-		}
-		else{
-			process.stdout.write(session.prompt);
-		}
-	});
 	process.stdin.setEncoding("utf8");
-	process.stdin.resume();
 	process.stdout.setEncoding("utf8");
 }
 

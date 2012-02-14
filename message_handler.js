@@ -9,9 +9,9 @@ var callbacks={}; // message handle callback functions
 callbacks["f_default"] = function(msg){
 	DBG_LOG("i", msg.cmd);
 	if( session.state != "LOGINED" ){
-		session.end();
+		session.shutDown();
 	}
-	process.stdout.write(session.prompt);
+	session.prompt();
 }
 
 callbacks["f_connect_ok"] = function(msg){
@@ -24,7 +24,7 @@ callbacks["f_connect_ok"] = function(msg){
 callbacks["f_login_ok"] = function(msg){
 	DBG_LOG("i", msg.cmd);
 	session.state = "LOGINED";
-	process.stdout.write(session.prompt);
+	session.prompt();
 }
 
 callbacks["f_hello"] = function(msg){
@@ -37,12 +37,18 @@ callbacks["f_get_name_resp"] = function(msg){
 	console.log("name: " + msg.name);
 	console.log("nickname: " + msg.nickname);
 	console.log("description: " + msg.description);
-	process.stdout.write(session.prompt);
+	session.prompt();
 }
 
 callbacks["f_who_resp"] = function(msg){
 	console.log(msg.name);
-	process.stdout.write(session.prompt);
+	console.log(msg.age);
+	session.prompt();
+}
+
+callbacks["f_quit_resp"] = function(msg){
+	console.log('Bye.');
+	session.shutDown();
 }
 
 module.exports.handlers = callbacks;
