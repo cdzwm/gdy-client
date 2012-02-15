@@ -52,9 +52,11 @@ session.shutDown = function(){
 	process.exit(0);
 }
 
-function processCmd(trunck){
-	if( trunck.length > 0){
-		if(session.sendMessage(message.new(trunck))){
+function processCmd(cmd){
+	if( cmd.length > 0){
+		// parse command
+
+		if(!session.sendMessage(message.new(cmd))){
 			// TODO: 发送信息错误处理。
 		}
 	}
@@ -90,6 +92,7 @@ function receiveMessage(data){
 //
 function cleanupSession(){
 	DBG_LOG("i", "disconnected.");
+	session.shutDown();
 }
 
 //

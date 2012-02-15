@@ -52,8 +52,9 @@ callbacks["f_quit_resp"] = function(msg){
 }
 
 callbacks["f_list_room_resp"] = function(msg){
+	console.log("\tList of game rooms\n");
 	for(var r in msg.rooms){
-		console.log(msg.rooms[r].name);
+		console.log("\t\t" + msg.rooms[r].id + "." + msg.rooms[r].name);
 	}
 	session.prompt();
 }
