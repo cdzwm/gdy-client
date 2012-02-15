@@ -16,7 +16,7 @@ callbacks["f_default"] = function(msg){
 
 callbacks["f_connect_ok"] = function(msg){
 	var mymsg = message.new("LOGIN");
-	mymsg.username="player1";
+	mymsg.username="canw";
 	mymsg.password="password";
 	session.sendMessage( mymsg);
 }
@@ -49,6 +49,13 @@ callbacks["f_who_resp"] = function(msg){
 callbacks["f_quit_resp"] = function(msg){
 	console.log('Bye.');
 	session.shutDown();
+}
+
+callbacks["f_list_room_resp"] = function(msg){
+	for(var r in msg.rooms){
+		console.log(msg.rooms[r].name);
+	}
+	session.prompt();
 }
 
 module.exports.handlers = callbacks;

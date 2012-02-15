@@ -1,11 +1,12 @@
-require("./lib/comm/debug");
-require("./lib/comm/util");
+require("./lib/comm/debug"); // for debug
+require("./lib/comm/util"); // Add some util functions.
 
 var EventEmitter = require("events").EventEmitter;
 module.exports = new EventEmitter();
-var readline = require("readline"), cli;
 
-global.session = {};
+var readline = require("readline")
+	,cli; // command line interface variable
+
 var net = require('net');
 var message = require("./lib/comm/message")
 	,handlers = require("./message_handler").handlers;
@@ -15,18 +16,35 @@ var client = net.connect(port, host, connect);
 
 client.on("error", function(err){
 	DBG_LOG("e", "Cannot connect to server.");
+	session.shutDown();
 });
+
+global.session = {}; // declare global session object
+
+session.data = "";
+session.mq=[];
+session.state = "";
+session.p = "Cmd>"; // command prompt
+
+// send message function
+session.sendMessage = function(msg){
+	try{
+		var ret = client.write(message.pack(msg), function(){
+		});
+	}
+	catch(e){
+		return false;
+	}
+	return true;
+}
+
+// print command prompt
+session.prompt = function(){
+	cli.prompt();
+}
 
 session.end = function(){
 	client.end();
-}
-session.data = "";
-session.mq=[];
-session.pro = "Cmd>";
-session.state = "";
-session.sendMessage = sendMessage;
-session.prompt = function(){
-	cli.prompt();
 }
 
 session.shutDown = function(){
@@ -46,7 +64,7 @@ function processCmd(trunck){
 }
 
 cli = readline.createInterface(process.stdin, process.stdout);
-cli.setPrompt(session.pro, session.pro.length);
+cli.setPrompt(session.p, session.p.length);
 cli.on('line', processCmd);
 
 function connect(){
@@ -60,18 +78,6 @@ function connect(){
 	session.state = "CONNECT";
 	process.stdin.setEncoding("utf8");
 	process.stdout.setEncoding("utf8");
-}
-
-// send message function
-function sendMessage(msg){
-	try{
-		var ret = client.write(message.pack(msg), function(){
-		});
-	}
-	catch(e){
-		return false;
-	}
-	return true;
 }
 
 //
