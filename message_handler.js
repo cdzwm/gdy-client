@@ -9,12 +9,13 @@ var callbacks={}; // message handle callback functions
 callbacks["f_default"] = function(msg){
 	DBG_LOG("i", msg.cmd);
 	if( session.state != "LOGINED" ){
-		session.shutDown();
+		session.end();
 	}
 	session.prompt();
 }
 
 callbacks["f_connect_ok"] = function(msg){
+	clearTimeout(session.timer);
 	var mymsg = message.new("LOGIN");
 	mymsg.username="canw";
 	mymsg.password="password";
@@ -41,14 +42,13 @@ callbacks["f_get_name_resp"] = function(msg){
 }
 
 callbacks["f_who_resp"] = function(msg){
-	console.log(msg.name);
-	console.log(msg.age);
+	console.log(msg.u);
 	session.prompt();
 }
 
 callbacks["f_quit_resp"] = function(msg){
 	console.log('Bye.');
-	session.shutDown();
+	session.end();
 }
 
 callbacks["f_list_room_resp"] = function(msg){
@@ -56,6 +56,11 @@ callbacks["f_list_room_resp"] = function(msg){
 	for(var r in msg.rooms){
 		console.log("\t\t" + msg.rooms[r].id + "." + msg.rooms[r].name);
 	}
+	session.prompt();
+}
+
+callbacks["f_count_resp"] = function(msg){
+	console.log(msg.count);
 	session.prompt();
 }
 

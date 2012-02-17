@@ -11,20 +11,24 @@ var net = require('net');
 var message = require("./lib/comm/message")
 	,handlers = require("./message_handler").handlers;
 
-var host="127.0.0.1", port=10086;
-var client = net.connect(port, host, connect);
+process.stdin.setEncoding("utf8");
+process.stdout.setEncoding("utf8");
 
-client.on("error", function(err){
-	DBG_LOG("e", "Cannot connect to server.");
-	session.shutDown();
-});
+var host="127.0.0.1", port=10086;
+var client = net.connect(port, host);
+client.setEncoding("utf8");
+
+client.on("connect", connect);
+client.on("data", onData);
+client.on("error", onError);
+client.on("close", onClose);
 
 global.session = {}; // declare global session object
-
 session.data = "";
 session.mq=[];
 session.state = "";
-session.p = "Cmd>"; // command prompt
+session.p = "gdy>"; // command prompt
+session.timer = null;
 
 // send message function
 session.sendMessage = function(msg){
@@ -38,66 +42,45 @@ session.sendMessage = function(msg){
 	return true;
 }
 
-// print command prompt
+// display command prompt
 session.prompt = function(){
 	cli.prompt();
 }
 
+// end session
 session.end = function(){
 	client.end();
 }
 
-session.shutDown = function(){
-	client.end();
-	process.exit(0);
-}
-
-function processCmd(cmd){
-	if( cmd.length > 0){
-		// parse command
-
-		if(!session.sendMessage(message.new(cmd))){
-			// TODO: 发送信息错误处理。
-		}
-	}
-	else{
-		cli.prompt();
-	}
-}
-
-cli = readline.createInterface(process.stdin, process.stdout);
-cli.setPrompt(session.p, session.p.length);
-cli.on('line', processCmd);
-
+// connect to server
 function connect(){
-	client.setEncoding("utf8");
-	client.on("data", receiveMessage);
-	client.on("close", cleanupSession);
-	client.on("error", handleSocketError);
-
-	// begin to connect
-	session.sendMessage(message.new("CONNECT"));
 	session.state = "CONNECT";
-	process.stdin.setEncoding("utf8");
-	process.stdout.setEncoding("utf8");
+	session.timer = setTimeout(function (){
+		session.end();
+	}, 5000);
+	session.sendMessage(message.new("CONNECT"));
 }
 
-//
-function receiveMessage(data){
+// receive data
+function onData(data){
 	session.data += data;
 	session.data = session.data.slice(message.parseMessage(session.data, session.mq));
 	processMessage();
 }
 
-//
-function cleanupSession(){
-	DBG_LOG("i", "disconnected.");
-	session.shutDown();
+function onClose(){
+	DBG_LOG("i", "socket closed.");
+	process.exit(0);
 }
 
-//
-function handleSocketError(){
-	DBG_LOG("i", "socket error");
+// handle connection error
+function onError(err){
+	if( err.errno == 'ECONNREFUSED' ){
+		console.log("Cannot connect to server.");
+	}else{
+		console.log("Unknow network error. ");
+	}
+	client.destroy();
 }
 
 // dispatch message
@@ -113,5 +96,21 @@ function processMessage(){
 				handlers["f_default"](msg);
 			}
 		}
+	}
+}
+
+// handle command line
+cli = readline.createInterface(process.stdin, process.stdout);
+cli.setPrompt(session.p, session.p.length);
+cli.on('line', processCmd);
+
+function processCmd(cmd){
+	if( cmd.length > 0){
+		if(!session.sendMessage(message.new(cmd))){
+			console.log("Disconnected from server.")
+		}
+	}
+	else{
+		cli.prompt();
 	}
 }
