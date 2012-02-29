@@ -1,5 +1,5 @@
 require("./lib/comm/debug"); // for debug
-require("./lib/comm/util"); // Add some util functions.
+require("./lib/comm/gdyutil"); // Add some util functions.
 
 var EventEmitter = require("events").EventEmitter;
 module.exports = new EventEmitter();
