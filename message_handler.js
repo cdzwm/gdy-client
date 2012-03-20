@@ -64,4 +64,9 @@ callbacks["f_count_resp"] = function(msg){
 	session.prompt();
 }
 
+callbacks['f_server_name_resp'] = function(msg){
+	console.log(msg.server_name);
+	session.prompt();
+}
+
 module.exports.handlers = callbacks;
